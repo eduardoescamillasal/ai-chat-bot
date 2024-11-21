@@ -11,11 +11,15 @@ const ChatBotApp = () => {
         </div>
         <div className='chat-list-item active'>
           <h4>Chat 20/07/24 12:59:42 PM</h4>
-          <i className='bx bx-x circle'></i>
+          <i className='bx bx-x-circle'></i>
         </div>
         <div className='chat-list-item'>
           <h4>Chat 20/07/24 12:59:42 PM</h4>
-          <i className='bx bx-x circle'></i>
+          <i className='bx bx-x-circle'></i>
+        </div>
+        <div className='chat-list-item'>
+          <h4>Chat 20/07/24 12:59:42 PM</h4>
+          <i className='bx bx-x-circle'></i>
         </div>
       </div>
       <div className='chat-window'>
