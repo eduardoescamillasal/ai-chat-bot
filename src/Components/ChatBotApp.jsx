@@ -1,4 +1,5 @@
 import React from "react";
+import "./ChatBotApp.css"
 
 const ChatBotApp = () => {
   return (
@@ -8,7 +9,7 @@ const ChatBotApp = () => {
           <h2>Chat List</h2>
           <i className='bx bx-edit-alt new-chat'></i>
         </div>
-        <div className='chat-list-item'>
+        <div className='chat-list-item active' >
           <h4>Chat 20/07/24 12:59:42 PM</h4>
           <i className='bx bx-x circle'></i>
         </div>
@@ -29,7 +30,9 @@ const ChatBotApp = () => {
             </div>
             <div className="typing">Typing...</div>
             <form className="msg-form">
-              i.fa-solid.fa-face
+              <i className="fa-solid fa-face smile emoji"></i>
+              <input type="text" className="msg-input" placeholder="Type a message..." />
+              <i className="fa-solid fa-paper-plane"></i>
             </form>
           </i>
         </div>
