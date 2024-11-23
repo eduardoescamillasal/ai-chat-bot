@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from "react";
 import "./ChatBotApp.css";
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+
 
 const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNewChat}) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState(chats[0]?.messages || []);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const activeChatObj = chats.find((chat) => chat.id === activeChat);
@@ -14,7 +17,7 @@ const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNew
     setInputValue(e.target.value);
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (inputValue.trim === "") return;
 
     const newMessage = {
@@ -24,7 +27,7 @@ const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNew
     };
 
     if (!activeChat) {
-      onNewChat( inputValue );
+      onNewChat(inputValue);
       setInputValue("");
     } else {
       const updatedMessages = [...messages, newMessage];
@@ -37,7 +40,42 @@ const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNew
         }
         return chat;
       });
-      setChats(updatedChats);
+      setChats( updatedChats );
+      setIsTyping(true);
+
+      const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{role: "user", content: inputValue}],
+          max_tokens: 500,
+        }),
+      });
+
+      const data = await response.json();
+      const chatResponse = data.choices[0].message.content.trim();
+
+      const newResponse = {
+        type: "response",
+        text: chatResponse,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      const updatedMessagesWithResponse = [...updatedMessages, newResponse];
+      setMessages(updatedMessagesWithResponse);
+
+      const updatedChatsWithResponse = chats.map((chat) => {
+        if (chat.id === activeChat) {
+          return {...chat, messages: updatedMessagesWithResponse};
+        }
+        return chat;
+      });
+      setChats(updatedChatsWithResponse);
+      setIsTyping(false);
     }
   };
 
@@ -67,7 +105,7 @@ const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNew
       <div className='chat-list'>
         <div className='chat-list-header'>
           <h2>Chat List</h2>
-          <i className='bx bx-edit-alt new-chat' onClick={()=>onNewChat("")}></i>
+          <i className='bx bx-edit-alt new-chat' onClick={() => onNewChat("")}></i>
         </div>
         {chats.map((chat) => (
           <div
@@ -96,8 +134,7 @@ const ChatBotApp = ({onGoBack, chats, setChats, activeChat, setActiveChat, onNew
               <span>{msg.timestamp}</span>
             </div>
           ))}
-
-          <div className='typing'>Typing...</div>
+          {isTyping && <div className='typing'>Typing...</div>}
         </div>
         <form className='msg-form' onSubmit={(e) => e.preventDefault()}>
           <i className='fa-solid fa-face-smile emoji'></i>
